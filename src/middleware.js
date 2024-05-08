@@ -1,5 +1,5 @@
 import { next } from "@vercel/edge";
-
+//test
 export const config = {
   matcher: "/(.*)", // 兄弟および配下のディレクトリに認証処理を設ける
 };
