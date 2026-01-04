@@ -59,6 +59,15 @@ const Yearly = ({
 
   //年間の合計データ
   const { income, expense, balance } = financeCalculations(yearTransactions);
+
+  //年削除の処理
+  const handleDeleteYear = async () => {
+    const yearTransactionIds = yearTransactions.map((t) => t.id);
+    if (yearTransactionIds.length > 0) {
+      await onDeleteTransaction(yearTransactionIds);
+    }
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} mb={2}>
@@ -66,6 +75,7 @@ const Yearly = ({
         <YearSelector
           currentYear={currentYear}
           setCurrentYear={setCurrentYear}
+          onDeleteYear={handleDeleteYear}
         />
       </Grid>
       {/* 年間合計 */}

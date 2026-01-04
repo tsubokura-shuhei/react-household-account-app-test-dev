@@ -13,7 +13,7 @@
 }
 
 .fc-col-header-cell {
-  background-color: #42a5f5;
+  background-color: #689f38; /* 濃いめの黄緑色（ヘッダーと同じ色） */
   color: white; /* ヘッダーのテキスト色を白に設定 */
 }
 

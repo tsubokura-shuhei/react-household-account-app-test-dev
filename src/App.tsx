@@ -1,22 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Report from "./pages/Report";
 import Yearly from "./pages/Yearly";
-import axios from "axios";
 
 import NoMatch from "./pages/NoMatch";
 import AppLayout from "./pages/components/layout/AppLayout";
 import { theme } from "./theme/theme";
 import { ThemeProvider } from "@emotion/react";
-import {
-  CssBaseline,
-  selectClasses,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { Transaction, Year } from "./types/index";
+import { CssBaseline } from "@mui/material";
+import { Transaction } from "./types/index";
 
 import {
   collection,
@@ -27,8 +21,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import { formatMonth, formatMonthly, formatYear } from "./utils/formatting";
+import { formatMonth, formatYear } from "./utils/formatting";
 import { Schema } from "./validations/schema";
 
 function App() {
@@ -198,121 +191,61 @@ function App() {
     }
   };
 
-  // ===================認証ここから==================
-
-  console.log("サイレンダリング！！");
-
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  const inputNameRef = useRef<HTMLInputElement>(null);
-  const inputPassRef = useRef<HTMLInputElement>(null);
-
-  const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-
-    // try {
-    //   const respons = await axios.post("http://localhost:8000/login", {
-    //     username: inputNameRef.current?.value,
-    //     password: inputPassRef.current?.value,
-    //   });
-    //   console.log(respons.data);
-    // }
-    try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: inputNameRef.current?.value,
-          password: inputPassRef.current?.value,
-        }),
-      });
-
-      const data = await response.json();
-      setLoggedIn(data.loginStatus); // ログインステータスをセット
-    } catch (error) {
-      console.error("データ送信に失敗しました", error);
-    }
-  };
-
-  const loginStatus = false;
-
-  // ===================認証ここまで==================
-
   return (
-    <>
-      {!loggedIn ? (
-        // 認証画面
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>Username:</label>
-            <input type="text" ref={inputNameRef} />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input type="password" ref={inputPassRef} />
-          </div>
-          <button type="submit">Login</button>
-        </form>
-      ) : (
-        // メイン画面
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Router>
-            <Routes>
-              {/* ホーム */}
-              <Route path="/" element={<AppLayout />}>
-                <Route
-                  index
-                  element={
-                    <Home
-                      monthlyTransactions={monthlyTransactions}
-                      setCurrentMonth={setCurrentMonth}
-                      onSaveTransaction={handleSaveTransaction}
-                      onDeleteTransaction={handleDeleteTransaction}
-                      onUpdateTransaction={handleUpdateTransaction}
-                    />
-                  }
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          {/* ホーム */}
+          <Route path="/" element={<AppLayout />}>
+            <Route
+              index
+              element={
+                <Home
+                  monthlyTransactions={monthlyTransactions}
+                  setCurrentMonth={setCurrentMonth}
+                  onSaveTransaction={handleSaveTransaction}
+                  onDeleteTransaction={handleDeleteTransaction}
+                  onUpdateTransaction={handleUpdateTransaction}
                 />
-                {/* 月々の合計 */}
-                <Route
-                  path="/report"
-                  element={
-                    <Report
-                      currentMonth={currentMonth}
-                      setCurrentMonth={setCurrentMonth}
-                      monthlyTransactions={monthlyTransactions}
-                      isLoading={isLoading}
-                      onDeleteTransaction={handleDeleteTransaction}
-                      transaction={transaction}
-                      currentYear={currentYear}
-                    />
-                  }
+              }
+            />
+            {/* 月々の合計 */}
+            <Route
+              path="/report"
+              element={
+                <Report
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  monthlyTransactions={monthlyTransactions}
+                  isLoading={isLoading}
+                  onDeleteTransaction={handleDeleteTransaction}
+                  transaction={transaction}
+                  currentYear={currentYear}
                 />
-                {/* 年間の合計 */}
-                <Route
-                  path="/yearly"
-                  element={
-                    <Yearly
-                      currentYear={currentYear}
-                      setCurrentYear={setCurrentYear}
-                      isLoading={isLoading}
-                      onDeleteTransaction={handleDeleteTransaction}
-                      yearTransactions={yearTransactions}
-                      monthlyTransactions={monthlyTransactions}
-                      transaction={transaction}
-                    />
-                  }
+              }
+            />
+            {/* 年間の合計 */}
+            <Route
+              path="/yearly"
+              element={
+                <Yearly
+                  currentYear={currentYear}
+                  setCurrentYear={setCurrentYear}
+                  isLoading={isLoading}
+                  onDeleteTransaction={handleDeleteTransaction}
+                  yearTransactions={yearTransactions}
+                  monthlyTransactions={monthlyTransactions}
+                  transaction={transaction}
                 />
-                {/* ページが存在しない場合 */}
-                <Route path="*" element={<NoMatch />} />
-              </Route>
-            </Routes>
-          </Router>
-        </ThemeProvider>
-      )}
-    </>
+              }
+            />
+            {/* ページが存在しない場合 */}
+            <Route path="*" element={<NoMatch />} />
+          </Route>
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 

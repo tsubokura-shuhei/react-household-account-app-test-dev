@@ -52,6 +52,7 @@ export default function AppLayout() {
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
+          bgcolor: "#689f38", // 濃いめの黄緑色
         }}
       >
         <Toolbar>

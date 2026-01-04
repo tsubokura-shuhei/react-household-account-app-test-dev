@@ -40,6 +40,15 @@ const Report = ({
     flexDirection: "column",
     p: 2,
   };
+
+  //月削除の処理
+  const handleDeleteMonth = async () => {
+    const monthTransactionIds = monthlyTransactions.map((t) => t.id);
+    if (monthTransactionIds.length > 0) {
+      await onDeleteTransaction(monthTransactionIds);
+    }
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -47,6 +56,7 @@ const Report = ({
         <MonthSelector
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
+          onDeleteMonth={handleDeleteMonth}
         />
       </Grid>
       <Grid item xs={12} md={4}>
