@@ -126,9 +126,21 @@ const YearSelector = ({
           gap: 1,
         }}
       >
-        {/* スマホの時：ボタン行（去年、来年、年削除） */}
+        {/* スマホの時 */}
         {isMobile ? (
           <>
+            <DatePicker
+              onChange={handleDateChange}
+              value={currentYear}
+              label="年を選択"
+              sx={{ width: "100%", background: "white" }}
+              views={["year"]}
+              format={`yyyy年`}
+              slotProps={{
+                toolbar: { toolbarFormat: "yyyy年", hidden: false },
+              }}
+            />
+            {/* 去年と来年ボタン（年を選択の下） */}
             <Box
               sx={{
                 display: "flex",
@@ -153,6 +165,18 @@ const YearSelector = ({
               >
                 来年
               </Button>
+            </Box>
+            {/* 年削除とデータ保存ボタン */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+                width: "100%",
+              }}
+            >
               {onDeleteYear && (
                 <Button
                   color={"error"}
@@ -162,18 +186,16 @@ const YearSelector = ({
                   年削除
                 </Button>
               )}
+              <Button
+                color={"success"}
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportCSV}
+                disabled={yearTransactions.length === 0}
+              >
+                データ保存
+              </Button>
             </Box>
-            <DatePicker
-              onChange={handleDateChange}
-              value={currentYear}
-              label="年を選択"
-              sx={{ width: "100%", background: "white", mt: 2 }}
-              views={["year"]}
-              format={`yyyy年`}
-              slotProps={{
-                toolbar: { toolbarFormat: "yyyy年", hidden: false },
-              }}
-            />
           </>
         ) : (
           <>
@@ -212,7 +234,7 @@ const YearSelector = ({
               >
                 来年
               </Button>
-              {/* PCのみ表示：データ保存ボタン */}
+              {/* データ保存ボタン */}
               <Button
                 color={"success"}
                 variant="contained"
