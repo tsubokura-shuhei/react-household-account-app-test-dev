@@ -12,21 +12,25 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { addYears } from "date-fns";
+import { addYears, format } from "date-fns";
 import { ja } from "date-fns/locale";
 import React, { useState } from "react";
+import { Transaction } from "../../types";
+import DownloadIcon from "@mui/icons-material/Download";
 
-interface MonthProps {
+interface YearProps {
   currentYear: Date;
   setCurrentYear: React.Dispatch<React.SetStateAction<Date>>;
   onDeleteYear?: () => void;
+  yearTransactions: Transaction[];
 }
 
 const YearSelector = ({
   currentYear,
   setCurrentYear,
   onDeleteYear,
-}: MonthProps) => {
+  yearTransactions,
+}: YearProps) => {
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -66,6 +70,46 @@ const YearSelector = ({
       onDeleteYear();
       setOpenDialog(false);
     }
+  };
+
+  //CSVエクスポートの処理
+  const handleExportCSV = () => {
+    // CSVヘッダー
+    const headers = ["日付", "種類", "カテゴリ", "内容", "金額"];
+
+    // データをCSV形式に変換
+    const csvRows = [
+      headers.join(","),
+      ...yearTransactions.map((transaction: Transaction) => {
+        const type = transaction.type === "income" ? "収入" : "支出";
+        return [
+          transaction.date,
+          type,
+          transaction.category,
+          `"${transaction.content.replace(/"/g, '""')}"`, // ダブルクォートをエスケープ
+          transaction.amount.toString(),
+        ].join(",");
+      }),
+    ];
+
+    // CSV文字列を作成
+    const csvContent = csvRows.join("\n");
+
+    // BOMを追加してUTF-8でエンコード（Excelで正しく開くため）
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    // ダウンロードリンクを作成
+    const link = document.createElement("a");
+    const yearStr = format(currentYear, "yyyy");
+    link.href = URL.createObjectURL(blob);
+    link.download = `家計簿_${yearStr}年.csv`;
+    link.click();
+
+    // メモリを解放
+    URL.revokeObjectURL(link.href);
   };
 
   return (
@@ -167,6 +211,16 @@ const YearSelector = ({
                 onClick={handleNextYear}
               >
                 来年
+              </Button>
+              {/* PCのみ表示：データ保存ボタン */}
+              <Button
+                color={"success"}
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportCSV}
+                disabled={yearTransactions.length === 0}
+              >
+                データ保存
               </Button>
               {onDeleteYear && (
                 <Button

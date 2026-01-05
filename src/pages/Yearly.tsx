@@ -76,6 +76,7 @@ const Yearly = ({
           currentYear={currentYear}
           setCurrentYear={setCurrentYear}
           onDeleteYear={handleDeleteYear}
+          yearTransactions={yearTransactions}
         />
       </Grid>
       {/* 年間合計 */}
